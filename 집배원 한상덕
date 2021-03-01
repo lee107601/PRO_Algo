@@ -1,0 +1,73 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+#include<queue>
+#define INF 2100000000
+using namespace std;
+
+int n,m;
+char A[51][51] = { 0, };
+int H[51][51] = { 0, };
+vector<int>B;
+int sy, sx;
+int d[8][2] = { {-1,0},{0,1},{1,0},{0,-1},{1,-1},{-1,1},{1,1},{-1,-1} };
+
+bool bfs(int mn,int mx) {
+	bool visit[51][51] = { 0, };
+	queue<pair<int, int>>q;
+	if (H[sy][sx]<mn || H[sy][sx]>mx) return 0;
+	q.push({ sy,sx });
+	visit[sy][sx] = 1;
+	pair<int, int>p;
+	int cnt = 0;
+	while (!q.empty()) {
+		p = q.front();
+		q.pop();
+		for (int i = 0; i < 8; i++) {
+			int ny = p.first + d[i][0];
+			int nx = p.second + d[i][1];
+			if (ny >= 1 && nx >= 1 && ny <= n && nx <= n && visit[ny][nx] == 0&&mn<=H[ny][nx]&&H[ny][nx]<=mx) {
+				visit[ny][nx] = 1;
+				if (A[ny][nx] == 'K') cnt++;
+				q.push({ ny,nx });
+			}
+		}
+	}
+	if (cnt == m) return 1;
+	else return 0;
+}
+
+int main() {
+	scanf(" %d", &n);
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) {
+			scanf(" %c", &A[i][j]);
+			if (A[i][j] == 'P') {
+				sy = i;
+				sx = j;
+			}
+			else if (A[i][j] == 'K') {
+				m++;
+			}
+		}
+	}
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) {
+			scanf(" %d", &H[i][j]);
+			B.push_back(H[i][j]);
+		}
+	}
+	sort(B.begin(), B.end());
+	int s = 0,e=0;
+	int ans = INF;
+	while (s <= e&&e<n*n) {
+		if (bfs(B[s], B[e])) {
+			ans = min(ans, B[e] - B[s]);
+			s++;
+		}
+		else {
+			e++;
+		}
+	}
+	printf("%d\n", ans);
+}
